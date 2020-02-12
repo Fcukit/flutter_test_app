@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/src/material/banner_theme.dart';
 import 'package:flutter/src/painting/text_style.dart';
-
+import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
+import 'package:intl/intl.dart';
 
 final List<String> imgList = [
   'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
@@ -99,8 +99,20 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+class HousePage extends StatefulWidget {
+  @override
+  HousePageState createState() => HousePageState();
+}
 
-class HousePage extends StatelessWidget {
+class HousePageState extends State<HousePage> {
+  var ttext = '';
+
+  void _updateRange(String str) {
+   setState(() {
+     ttext = str;
+   });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,13 +132,35 @@ class HousePage extends StatelessWidget {
               viewportFraction: 0.9,
               aspectRatio: 2.0,
             ),
+            Text('Выбранная дата: $ttext'),
+            new MaterialButton(
+                color: Colors.lightBlueAccent,
+                onPressed: () async {
+                  final List<DateTime> picked = await DateRagePicker.showDatePicker(
+                      context: context,
+                      initialFirstDate: new DateTime.now(),
+                      initialLastDate: (new DateTime.now()).add(new Duration(days: 7)),
+                      firstDate: new DateTime(2015),
+                      lastDate: new DateTime(DateTime.now().year + 2)
+                  );
+                  if (picked != null) {
+                    if (picked.length > 1) {
+                      _updateRange(new DateFormat.yMMMd().format(picked[0]).toString() + ' - ' + new DateFormat.yMMMd().format(picked[1]).toString());
+                    } else {
+                      _updateRange(new DateFormat.yMMMd().format(picked[0]).toString());
+                    }
+
+                  }
+                },
+                child: new Text("Забронировать")
+            ),
             Padding(
                 padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                 child: Text('Сутки считаются с 12.00 до 14.00 следующего дня, соответственно, заезд в сектор не позднее 12.00, выезд из сектора не позднее 14.00. Въезд на территорию базы отдыха с 06.00 до 20.00. Если рыболов приехал позже 12.00, то сутки будут считаться уже идущими и закончатся в 14.00 следующего дня.  Минимальное нахождение в секторе двое суток. Стоимость посещения: 500руб./ сутки с человека. Сопровождающие женщины, дети до 12 лет могут находиться на водоеме  бесплатно.', style: Theme.of(context).textTheme.caption)),
             RaisedButton(
               textColor: Colors.white,
               color: Colors.lightBlueAccent,
-              child: Text('Забронировать'),
+              child: Text('На главную'),
               onPressed: () {
                 Navigator.pop(context);
               },
